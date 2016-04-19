@@ -4,10 +4,10 @@ var _0 =
   '|_|' +
   '   ';
 var _1 =
-    '   ' +
-    '  |' +
-    '  |' +
-    '   ';
+  '   ' +
+  '  |' +
+  '  |' +
+  '   ';
 var patterns = {};
 patterns[_0] = '0';
 patterns[_1] = '1';
@@ -26,18 +26,18 @@ module.exports = {
       }
       // saltare ultime righe se rimanenti < 4
 
-      digits[l] = '';
+      digits[Math.floor(l / 4)] = '';
       for (var d = 0; d < 27; d += 3) {
         var key = lines[l][d] + lines[l][d + 1] + lines[l][d + 2] +
           lines[l + 1][d] + lines[l + 1][d + 1] + lines[l + 1][d + 2] +
           lines[l + 2][d] + lines[l + 2][d + 1] + lines[l + 2][d + 2] +
           lines[l + 3][d] + lines[l + 3][d + 1] + lines[l + 3][d + 2];
-        
-        digits[Math.floor(l/4)] += patterns[key];
+
+        digits[Math.floor(l / 4)] += patterns[key];
       }
     }
 
 
-    return digits.join();
+    return digits;
   }
 }
