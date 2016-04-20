@@ -1,43 +1,104 @@
-var _0 =
-  ' _ ' +
-  '| |' +
-  '|_|' +
-  '   ';
-var _1 =
-  '   ' +
-  '  |' +
-  '  |' +
-  '   ';
-var patterns = {};
-patterns[_0] = '0';
-patterns[_1] = '1';
+var fs = require('fs');
+var digits = init();
+
 module.exports = {
-  parse: function(text) {
-    var lines = text.split('\n');
+  parse: parse,
+  parseFile: function(filename) {
+    return parse(fs.readFileSync(filename).toString())
+  }
+}
 
-    var digits = [];
-    for (var l = 0; l < lines.length; l += 4) {
-      if (!lines[l].length) {
-        continue;
-      }
+function parse(text) {
+  var lines = text.split('\n');
 
-      if (lines[l].length != 27) {
-        throw new Error('Numero di caratteri errato: ' + lines[l].length);
-      }
-      // saltare ultime righe se rimanenti < 4
-
-      digits[Math.floor(l / 4)] = '';
-      for (var d = 0; d < 27; d += 3) {
-        var key = lines[l][d] + lines[l][d + 1] + lines[l][d + 2] +
-          lines[l + 1][d] + lines[l + 1][d + 1] + lines[l + 1][d + 2] +
-          lines[l + 2][d] + lines[l + 2][d + 1] + lines[l + 2][d + 2] +
-          lines[l + 3][d] + lines[l + 3][d + 1] + lines[l + 3][d + 2];
-
-        digits[Math.floor(l / 4)] += patterns[key];
-      }
+  var numbers = [];
+  for (var l = 0; l < lines.length; l += 4) {
+    if (!lines[l].length) {
+      continue;
     }
 
+    if (lines[l].length != 27) {
+      throw new Error('Numero di caratteri errato: ' + lines[l].length);
+    }
+    // saltare ultime righe se rimanenti < 4
 
-    return digits;
+    numbers[Math.floor(l / 4)] = '';
+    for (var d = 0; d < 27; d += 3) {
+      var key = lines[l].slice(d, d + 3) +
+        lines[l + 1].slice(d, d + 3) +
+        lines[l + 2].slice(d, d + 3) +
+        lines[l + 3].slice(d, d + 3);
+
+      numbers[Math.floor(l / 4)] += digits[key];
+    }
   }
+
+  return numbers;
+}
+
+function init() {
+  var digits = {},
+    _0 =
+    ' _ ' +
+    '| |' +
+    '|_|' +
+    '   ',
+    _1 =
+    '   ' +
+    '  |' +
+    '  |' +
+    '   ',
+    _2 =
+    ' _ ' +
+    ' _|' +
+    '|_ ' +
+    '   ',
+    _3 =
+    ' _ ' +
+    ' _|' +
+    ' _|' +
+    '   ',
+    _4 =
+    '   ' +
+    '|_|' +
+    '  |' +
+    '   ',
+    _5 =
+    ' _ ' +
+    '|_ ' +
+    ' _|' +
+    '   ',
+    _6 =
+    ' _ ' +
+    '|_ ' +
+    '|_|' +
+    '   ',
+    _7 =
+    ' _ ' +
+    '  |' +
+    '  |' +
+    '   ',
+    _8 =
+    ' _ ' +
+    '|_|' +
+    '|_|' +
+    '   ',
+    _9 =
+    ' _ ' +
+    '|_|' +
+    ' _|' +
+    '   ';
+
+  digits[_0] = '0';
+  digits[_1] = '1';
+  digits[_2] = '2';
+  digits[_3] = '3';
+  digits[_4] = '4';
+  digits[_5] = '5';
+  digits[_6] = '6';
+  digits[_7] = '7';
+  digits[_8] = '8';
+  digits[_9] = '9';
+
+  return digits;
 }
