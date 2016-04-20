@@ -1,5 +1,5 @@
 var assert = require('chai').assert;
-var parser = require('../program.js');
+var parser = require('../programre.js');
 
 var _0 = [
   ' _ ',
