@@ -1,33 +1,4 @@
-var fs = require('fs');
-var digits = init();
-
-module.exports = {
-  parse: parse,
-  parseFile: function(filename) {
-    return parse(fs.readFileSync(filename).toString())
-  }
-}
-
-console.log(parse(' _  _  _  _  _  _  _  _  _ | || || || || || || || || ||_||_||_||_||_||_||_||_||_|                           '));
-
-function parse(text) {
-  var numbers = [];
-
-  var digit = /(...).{30}(...).{1}(...)/g; //(...)[.\n\r]{24}(...)
-  var match;
-  console.log('before: '+text)
-  text=text.replace(/\n/g, '');
-  console.log('after: '+text)
-  while ((match = digit.exec(text)) !== null) {
-    console.log('whole: '+match[0]);
-    console.log('digits: '+match[1] + match[2] + match[3])
-    digit.lastIndex += 3;
-  }
-
-  return numbers;
-}
-
-function init() {
+module.exports = function() {
   var digits = {},
     _0 =
     ' _ ' +
