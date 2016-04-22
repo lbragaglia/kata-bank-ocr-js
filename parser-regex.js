@@ -1,5 +1,6 @@
 var fs = require('fs');
 var digits = require('./digits')();
+var digit = /(...)[ _|]{24}(...)[ _|]{24}(...)[ _|]{24}(...)/g;
 
 module.exports = {
   name: 'Regexp',
@@ -10,19 +11,25 @@ module.exports = {
 }
 
 function parse(text) {
-  var numbers = [];
+  var numbers = [],
+    pos = 0;
 
-  var digit = /(...)[ _|\r\n]{24}(...)[ _|\r\n]{24}(...)[ _|\r\n]{24}(...)/g;
-  var match;
-  text = text.replace(/\n/g, '');
-  var i = 0;
-  var account = 0;
-  while ((match = digit.exec(text)) !== null) {
-    var key = match[1] + match[2] + match[3] + match[4];
-    account = Math.floor(i / 9)
-    numbers[account] = (numbers[account] || '') + digits[key];
-    digit.lastIndex = 3 * ++i;
+  text = text.replace(/[\r\n]/g, '');
+
+  for (pos = 0; pos < text.length; pos += 27 * 4) {
+    var account = '';
+    [0, 1, 2, 3, 4, 5, 6, 7, 8].forEach(function(i) {
+      account += next(text, pos + i * 3);
+    })
+    numbers.push(account)
   }
-
   return numbers;
+}
+
+function next(text, pos) {
+  digit.lastIndex = pos;
+  var match = digit.exec(text);
+  if (match === null) return '';
+
+  return digits[match[1] + match[2] + match[3] + match[4]];
 }
