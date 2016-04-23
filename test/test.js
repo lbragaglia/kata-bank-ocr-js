@@ -11,11 +11,11 @@ var accounts = [
     describe('User Story 1', function() {
       accounts.forEach(function(account, i) {
         it('should parse account number ' + account, function() {
-          assert.equal(account, parser.parseFile('test/test' + i + '.txt')[0]);
+          assert.equal(account, parser.parseFile('test/test1_' + i + '.txt')[0]);
         });
       });
       it('should parse a file of 500 accounts', function() {
-        parser.parseFile('test/test11.txt').forEach(function(account, i) {
+        parser.parseFile('test/test1_11.txt').forEach(function(account, i) {
           assert.equal(accounts[i % 11], account);
         })
       });
@@ -26,6 +26,20 @@ var accounts = [
       });
       it('should check an invalid account number', function() {
         assert.isFalse(parser.isValid('111111111'));
+      });
+    });
+    describe('User Story 3', function() {
+      it('should output a valid status for account number 000000051', function() {
+        assert.equal('000000051', parser.parseFile('test/test3_1.txt', true));
+      });
+      it('should output an error status for account number 664371495', function() {
+        assert.equal('664371495 ERR', parser.parseFile('test/test3_4.txt', true));
+      });
+      it('should output an illegible status for account number 49006771?', function() {
+        assert.equal('49006771? ILL', parser.parseFile('test/test3_2.txt', true));
+      });
+      it('should output an illegible status for account number 1234?678?', function() {
+        assert.equal('1234?678? ILL', parser.parseFile('test/test3_3.txt', true));
       });
     });
   });

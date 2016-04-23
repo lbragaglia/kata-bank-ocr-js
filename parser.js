@@ -1,13 +1,11 @@
-var fs = require('fs'),
-  digits = require('./digits')(),
+var digits = require('./digits')(),
+  parseFile = require('./common').parseFile,
   isValid = require('./common').isValid;
 
 module.exports = {
   name: 'Simple',
   parse: parse,
-  parseFile: function(filename) {
-    return parse(fs.readFileSync(filename).toString())
-  },
+  parseFile: parseFile(parse),
   isValid: isValid
 }
 
@@ -32,7 +30,7 @@ function parse(text) {
         lines[l + 2].slice(d, d + 3) +
         lines[l + 3].slice(d, d + 3);
 
-      numbers[Math.floor(l / 4)] += digits[key];
+      numbers[Math.floor(l / 4)] += digits[key] || '?';
     }
   }
 
