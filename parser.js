@@ -1,12 +1,14 @@
-var fs = require('fs');
-var digits = require('./digits')();
+var fs = require('fs'),
+  digits = require('./digits')(),
+  isValid = require('./common').isValid;
 
 module.exports = {
   name: 'Simple',
   parse: parse,
   parseFile: function(filename) {
     return parse(fs.readFileSync(filename).toString())
-  }
+  },
+  isValid: isValid
 }
 
 function parse(text) {

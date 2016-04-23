@@ -1,13 +1,15 @@
-var fs = require('fs');
-var digits = require('./digits')();
-var digit = /(...)[ _|]{24}(...)[ _|]{24}(...)[ _|]{24}(...)/g;
+var fs = require('fs'),
+  digits = require('./digits')(),
+  isValid = require('./common').isValid,
+  digit = /(...)[ _|]{24}(...)[ _|]{24}(...)[ _|]{24}(...)/g;
 
 module.exports = {
   name: 'Regexp',
   parse: parse,
   parseFile: function(filename) {
     return parse(fs.readFileSync(filename).toString())
-  }
+  },
+  isValid: isValid
 }
 
 function parse(text) {

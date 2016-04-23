@@ -20,5 +20,13 @@ var accounts = [
         })
       });
     });
+    describe('User Story 2', function() {
+      it('should check a valid account number', function() {
+        assert.isTrue(parser.isValid('345882865'));
+      });
+      it('should check an invalid account number', function() {
+        assert.isFalse(parser.isValid('111111111'));
+      });
+    });
   });
 });
