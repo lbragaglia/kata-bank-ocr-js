@@ -1,10 +1,11 @@
-var assert = require('chai').assert;
-var simple = require('../parser');
-var regexp = require('../parser-regex');
-var accounts = [
-  '000000000', '111111111', '222222222', '333333333', '444444444', '555555555',
-  '666666666', '777777777', '888888888', '999999999', '123456789'
-];
+var assert = require('chai').assert,
+  simple = require('../parser'),
+  regexp = require('../parser-regex'),
+  isValid = require('../common').isValid,
+  accounts = [
+    '000000000', '111111111', '222222222', '333333333', '444444444', '555555555',
+    '666666666', '777777777', '888888888', '999999999', '123456789'
+  ];
 
 [simple, regexp].forEach(function(parser) {
   describe('KataBankOCR (parser: ' + parser.name + ')', function() {
@@ -22,10 +23,10 @@ var accounts = [
     });
     describe('User Story 2', function() {
       it('should check a valid account number', function() {
-        assert.isTrue(parser.isValid('345882865'));
+        assert.isTrue(isValid('345882865'));
       });
       it('should check an invalid account number', function() {
-        assert.isFalse(parser.isValid('111111111'));
+        assert.isFalse(isValid('111111111'));
       });
     });
     describe('User Story 3', function() {

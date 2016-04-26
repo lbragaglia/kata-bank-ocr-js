@@ -13,10 +13,10 @@ function getStatus(account) {
 };
 
 function parseFile(parse) {
-  return function(filename, status) {
+  return function(filename, showStatus) {
     return parse(fs.readFileSync(filename).toString()).map(function(account) {
       if (isValid(account)) return account;
-      return account + (status ? ' ' + getStatus(account) : '');
+      return account + (showStatus ? ' ' + getStatus(account) : '');
     })
   }
 };
