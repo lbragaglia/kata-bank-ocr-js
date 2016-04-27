@@ -1,4 +1,4 @@
-var digits = require('./digits')(),
+var digits = require('./digits').digits,
   parseFile = require('./common').parseFile,
   digit = /(...)[ _|]{24}(...)[ _|]{24}(...)[ _|]{24}(...)/g;
 

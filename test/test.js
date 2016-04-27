@@ -43,5 +43,19 @@ var assert = require('chai').assert,
         assert.equal('1234?678? ILL', parser.parseFile('test/test3_3.txt', true));
       });
     });
+    describe('User Story 4', function() {
+      it('should resolve an exact account number for 111111111', function() {
+        assert.equal('711111111', parser.parseFile('test/test4_1.txt', true));
+      });
+      it('should resolve an exact account number for 777777777', function() {
+        assert.equal('777777177', parser.parseFile('test/test4_2.txt', true));
+      });
+      it('should resolve an exact account number for 200000000', function() {
+        assert.equal('200800000', parser.parseFile('test/test4_3.txt', true));
+      });
+      it('should resolve an exact account number for 333333333', function() {
+        assert.equal('333393333', parser.parseFile('test/test4_4.txt', true));
+      });
+    });
   });
 });
