@@ -12,27 +12,52 @@ function getStatus(account) {
   return '';
 };
 
+function fromFile(filename) {
+  return fs.readFileSync(filename).toString();
+}
+
 function parseFile(parse) {
-  //return digits(chars(fromFile(filename)));
-  return function(filename, showStatus) {
-    return parse(fs.readFileSync(filename).toString()).map(function(account) {
-      if (isValid(account)) return account;
-      return account + (showStatus ? ' ' + getStatus(account) : '');
-    })
+  return function(filename) {
+    return parse(fromFile(filename));
+  };
+}
+
+function parseText(splitEntries, parseDigits) {
+  return function(text) {
+    parseDigits(splitEntries(text))
   }
-};
+}
+
+function addStatus(accounts) {
+  accounts.forEach(function(account) {
+    account.status = getStatus(account.number);
+  });
+
+  return accounts;
+}
+
+function print(accounts) {
+  var result = [];
+  accounts.forEach(function(account) {
+      result.push(account.number + (account.status ? ' ' + account.status : ''));
+  });
+return result;
+}
 
 function diff(text1, text2) {
-    var charDiff = '';
-    for (var i = 0; i < text1.length; i++) {
-      if (text1[i] !== text2[i]) charDiff.push(text1[i]);
-    }
-    return charDiff;
+  var charDiff = '';
+  for (var i = 0; i < text1.length; i++) {
+    if (text1[i] !== text2[i]) charDiff.push(text1[i]);
+  }
+  return charDiff;
 }
 
 module.exports = {
   isValid: isValid,
   getStatus: getStatus,
   parseFile: parseFile,
+  parseText: parseText,
+  addStatus: addStatus,
+  print: print,
   diff: diff
 }
