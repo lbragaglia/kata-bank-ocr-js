@@ -1,10 +1,9 @@
-var digits = require('./digits').digits,
-  parseFile = require('./common').parseFile,
-  parseText = require('./common').parseText;
+var parseText = require('./common').parseText(splitEntries),
+  parseFile = require('./common').parseFile;
 
 module.exports = {
   name: 'Simple',
-  parseFile: parseFile(parseText(splitEntries, parseDigits))
+  parseFile: parseFile(parseText)
 }
 
 function splitEntries(text) {
@@ -27,17 +26,6 @@ function splitEntries(text) {
       entries: entries
     });
   }
-
-  return accounts;
-}
-
-function parseDigits(accounts) {
-  accounts.forEach(function(account) {
-    account.number = '';
-    account.entries.forEach(function(entry) {
-      account.number += digits[entry] || '?';
-    })
-  });
 
   return accounts;
 }

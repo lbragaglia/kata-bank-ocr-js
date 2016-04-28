@@ -4,6 +4,7 @@ var assert = require('chai').assert,
   isValid = require('../common').isValid,
   addStatus = require('../common').addStatus,
   print = require('../common').print,
+  resolve = require('../common').resolve,
   accounts = [
     '000000000', '111111111', '222222222', '333333333', '444444444', '555555555',
     '666666666', '777777777', '888888888', '999999999', '123456789'
@@ -26,6 +27,9 @@ var assert = require('chai').assert,
     describe('User Story 2', function() {
       it('should check a valid account number', function() {
         assert.isTrue(isValid('345882865'));
+      });
+      it('should check a valid account number', function() {
+        assert.isTrue(isValid('200800000'));
       });
       it('should check an invalid account number', function() {
         assert.isFalse(isValid('111111111'));
@@ -67,5 +71,5 @@ function equalNumber(account, filename, parser) {
 }
 
 function equalStatus(account, filename, parser) {
-  assert.equal(account, print(addStatus(parser.parseFile(filename)))[0]);
+  assert.equal(account, print(resolve(addStatus(parser.parseFile(filename))))[0]);
 }

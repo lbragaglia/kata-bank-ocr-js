@@ -1,44 +1,32 @@
-var digits = require('./digits').digits,
+var parseText = require('./common').parseText(splitEntries),
   parseFile = require('./common').parseFile,
-  parseText = require('./common').parseText,
   digit = /(...)[ _|]{24}(...)[ _|]{24}(...)[ _|]{24}(...)/g;
 
 module.exports = {
   name: 'Regexp',
-  parseFile: parseFile(parseText(splitEntries, parseDigits))
+  parseFile: parseFile(parseText)
 }
 
 function splitEntries(text) {
   var accounts = [],
-    pos, account;
-
+    pos, entries;
   text = text.replace(/[\r\n]/g, '');
 
   for (pos = 0; pos < text.length; pos += 27 * 4) {
-    account = '';
+    entries = [];
     [0, 1, 2, 3, 4, 5, 6, 7, 8].forEach(function(i) {
-      account += next(text, pos + i * 3);
+      entries.push(next(text, pos + i * 3));
     })
-    accounts.push(account)
+    accounts.push({
+      entries: entries
+    });
   }
-  return accounts;
-}
-
-function parseDigits(accounts) {
-  accounts.forEach(function(account) {
-    account.number = '';
-    account.entries.forEach(function(entry) {
-      account.number += digits[entry] || '?';
-    })
-  });
-
   return accounts;
 }
 
 function next(text, pos) {
   digit.lastIndex = pos;
   var match = digit.exec(text);
-  if (match === null) return '';
 
-  return match[1] + match[2] + match[3] + match[4];
+  return match === null ? '' : match[1] + match[2] + match[3] + match[4];
 }
