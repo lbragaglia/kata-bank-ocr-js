@@ -61,6 +61,9 @@ digits[_7] = '7';
 digits[_8] = '8';
 digits[_9] = '9';
 
+exports._0 = _0;
+exports._1 = _1;
+exports._7 = _7;
 exports.digits = digits;
 exports.alternatives = [
   [8, 9, 6],
@@ -71,6 +74,6 @@ exports.alternatives = [
   [9, 6],
   [9, 5],
   [1],
-  [0, 9, 6],
+  [6, 0, 9],
   [0, 3, 5],
 ];

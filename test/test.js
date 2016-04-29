@@ -5,6 +5,10 @@ var assert = require('chai').assert,
   addStatus = require('../common').addStatus,
   print = require('../common').print,
   resolve = require('../common').resolve,
+  diff = require('../common').diff,
+  _0 = require('../digits')._0,
+  _1 = require('../digits')._1,
+  _7 = require('../digits')._7,
   accounts = [
     '000000000', '111111111', '222222222', '333333333', '444444444', '555555555',
     '666666666', '777777777', '888888888', '999999999', '123456789'
@@ -50,6 +54,15 @@ var assert = require('chai').assert,
       });
     });
     describe('User Story 4', function() {
+      it('should diff 1 char for 1 and 7', function() {
+        assert.equal(1, diff(_1, _7).length);
+      });
+      it('should diff 3 char for 0 and 7', function() {
+        assert.equal(3, diff(_0, _7).length);
+      });
+      it('should diff 4 char for 0 and 1', function() {
+        assert.equal(4, diff(_0, _1).length);
+      });
       it('should resolve an exact account number for 111111111', function() {
         equalStatus('711111111', 'test/test4_1.txt', parser);
       });
@@ -61,6 +74,33 @@ var assert = require('chai').assert,
       });
       it('should resolve an exact account number for 333333333', function() {
         equalStatus('333393333', 'test/test4_4.txt', parser);
+      });
+      it('should resolve ambiguously for 888888888', function() {
+        equalStatus("888888888 AMB ['888886888', '888888880', '888888988']", 'test/test4_5.txt', parser);
+      });
+      it('should resolve ambiguously for 555555555', function() {
+        equalStatus("555555555 AMB ['555655555', '559555555']", 'test/test4_6.txt', parser);
+      });
+      it('should resolve ambiguously for 666666666', function() {
+        equalStatus("666666666 AMB ['666566666', '686666666']", 'test/test4_7.txt', parser);
+      });
+      it('should resolve ambiguously for 999999999', function() {
+        equalStatus("999999999 AMB ['899999999', '993999999', '999959999']", 'test/test4_8.txt', parser);
+      });
+      it('should resolve ambiguously for 490067715', function() {
+        equalStatus("490067715 AMB ['490067115', '490067719', '490867715']", 'test/test4_9.txt', parser);
+      });
+      it('should resolve an exact account number for 123456789', function() {
+        equalStatus('123456789', 'test/test4_10.txt', parser);
+      });
+      it('should resolve an exact account number for 000000051', function() {
+        equalStatus('000000051', 'test/test4_11.txt', parser);
+      });
+      it('should resolve an exact account number for 490867715', function() {
+        equalStatus('490867715', 'test/test4_12.txt', parser);
+      });
+      it('should resolve an exact account number for ?9086717?', function() {
+        equalStatus('490867175', 'test/test4_13.txt', parser);
       });
     });
   });

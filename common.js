@@ -24,14 +24,18 @@ function parseFile(parse) {
   };
 }
 
+function parseAccount(entries) {
+  var account = '';
+  entries.forEach(function(entry) {
+    account += digits[entry] || '?';
+  })
+  return account;
+}
+
 function parseDigits(accounts) {
   accounts.forEach(function(account) {
-    account.number = '';
-    account.entries.forEach(function(entry) {
-      account.number += digits[entry] || '?';
-    })
+    account.number = parseAccount(account.entries);
   });
-
   return accounts;
 }
 
@@ -45,42 +49,63 @@ function addStatus(accounts) {
   accounts.forEach(function(account) {
     account.status = getStatus(account.number);
   });
-
   return accounts;
+}
+
+function collectAlternatives(entries, pos, alternatives, getAlternatives) {
+  if (pos >= entries.length) {
+    var alternative = parseAccount(entries);
+    if (isValid(alternative)) alternatives.push(alternative);
+    return;
+  }
+  getAlternatives(entries[pos]).forEach(function(alt) {
+    collectAlternatives(entries.slice(0, pos).concat(alt).concat(entries.slice(pos + 1)), pos + 1, alternatives, getAlternatives);
+  });
 }
 
 function resolve(accounts) {
   accounts.forEach(function(account) {
-    if (getStatus(account.number)) {
-      account.alternatives = [];
-      for (i = 0; i < account.number.length; i++) {
-        if (account.number[i] === '?') {
-          Object.keys(digits).forEach(function(altEntry) {
-            var altKey = account.entries.slice(0, i) + altEntry + account.entries.slice(i);
-            console.log(diff(account.entries[i], altEntry));
-            if (diff(account.entries[i], altEntry).length == 1) {
-              var alternative = digits[altKey];
-              if (isValid(alternative)) account.alternatives.push(alternative);
-            }
-          });
-        } else {
-          alternatives[parseInt(account.number[i], 10)].forEach(function(altDigit) {
-            var alternative = account.number.slice(0, i) + altDigit + account.number.slice(i + 1);
-            if (isValid(alternative)) account.alternatives.push(alternative);
-          });
+    if (!getStatus(account.number)) {
+      return;
+    }
+    account.alternatives = [];
+    collectAlternatives(account.entries, 0, account.alternatives, function(entry) {
+      var altDigits = [];
+      Object.keys(digits).forEach(function(altEntry) {
+        if (diff(entry, altEntry).length == 1) {
+          altDigits.push(altEntry);
         }
-      }
-      if (account.alternatives.length == 0) {
-        accounts.status = 'ILL';
-      } else if (account.alternatives.length == 1) {
-        account.number = account.alternatives[0];
-        account.status = '';
+      });
+      return altDigits;
+    });
+
+    /*
+    for (i = 0; i < account.number.length; i++) {
+      if (account.number[i] === '?') {
+        Object.keys(digits).forEach(function(altEntry) {
+          if (diff(account.entries[i], altEntry).length == 1) {
+            var alternative = account.number.slice(0, i) + digits[altEntry] + account.number.slice(i + 1);
+            if (isValid(alternative)) account.alternatives.push(alternative);
+          }
+        });
       } else {
-        account.status = 'AMB';
+        alternatives[parseInt(account.number[i], 10)].forEach(function(altDigit) {
+          var alternative = account.number.slice(0, i) + altDigit + account.number.slice(i + 1);
+          if (isValid(alternative)) account.alternatives.push(alternative);
+        });
       }
     }
+    */
+    if (account.alternatives.length == 0) {
+      accounts.status = 'ILL';
+    } else if (account.alternatives.length == 1) {
+      account.number = account.alternatives[0];
+      account.status = '';
+    } else {
+      account.alternatives.sort();
+      account.status = 'AMB';
+    }
   });
-
   return accounts;
 }
 
@@ -97,8 +122,9 @@ function print(accounts) {
 }
 
 function diff(text1, text2) {
-  var charDiff = [];
-  for (var i = 0; i < text1.length; i++) {
+  var charDiff = [],
+    i;
+  for (i = 0; i < text1.length && i < text2.length; i++) {
     if (text1[i] !== text2[i]) charDiff.push(text1[i]);
   }
   return charDiff;
