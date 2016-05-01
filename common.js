@@ -1,4 +1,5 @@
-'use strict'
+'use strict';
+
 var fs = require('fs'),
   digits = require('./digits').digits,
   alternatives = require('./digits').alternatives;
@@ -70,7 +71,7 @@ function collectAlternatives(entries, pos, alternatives, max, getSimilarDigits) 
     return;
   }
   
-  // TODO deve prendere in considerazione se l'entry corrente è illeggibile
+  // TODO deve prendere in considerazione se l'entry corrente è illeggibile '?'
   // (e quindi evitare di usarla) e calcolare max solo su quelle leggibili
   
   // recurse with original digits
@@ -116,6 +117,7 @@ function resolveMultiple(accounts, maxFixesPerAccount) {
   });
 }
 
+// template function with injected strategy
 function _resolve(accounts, strategy) {
   accounts.forEach(function(account) {
     if (isValid(account.number)) {
@@ -152,6 +154,7 @@ function print(accounts) {
   return result;
 }
 
+// main logic for the entry variant (alternative) detection
 function diff(text1, text2) {
   var charDiff = [],
     i;
