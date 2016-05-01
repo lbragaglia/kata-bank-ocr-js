@@ -66,14 +66,14 @@ exports._1 = _1;
 exports._7 = _7;
 exports.digits = digits;
 exports.alternatives = [
-  [8, 9, 6],
+  [8],
   [7],
   [],
   [9],
   [],
   [9, 6],
-  [9, 5],
+  [5, 8],
   [1],
   [6, 0, 9],
-  [0, 3, 5],
+  [3, 5, 8],
 ];

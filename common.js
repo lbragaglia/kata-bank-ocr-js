@@ -1,18 +1,24 @@
+'use strict'
 var fs = require('fs'),
   digits = require('./digits').digits,
   alternatives = require('./digits').alternatives;
 
 function isValid(account) {
+  return getChecksum(account) === 0;
+}
+
+function getChecksum(account) {
   return account.split('').reduceRight(function(prev, curr, i) {
+    // note: curr may be '?' (implicit coercion to number)
     return prev + curr * (9 - i);
-  }, 0) % 11 === 0;
-};
+  }, 0) % 11;
+}
 
 function getStatus(account) {
   if (account.indexOf('?') !== -1) return 'ILL';
   if (!isValid(account)) return 'ERR';
   return '';
-};
+}
 
 function fromFile(filename) {
   return fs.readFileSync(filename).toString();
@@ -52,37 +58,37 @@ function addStatus(accounts) {
   return accounts;
 }
 
-function collectAlternatives(entries, pos, alternatives, getAlternatives) {
+function spliceEntries(entries, pos, replacement) {
+  return entries.slice(0, pos).concat(replacement).concat(entries.slice(pos + 1))
+}
+
+function collectAlternatives(entries, pos, alternatives, max, getSimilarDigits) {
+  // end recursion
   if (pos >= entries.length) {
     var alternative = parseAccount(entries);
     if (isValid(alternative)) alternatives.push(alternative);
     return;
   }
-  getAlternatives(entries[pos]).forEach(function(alt) {
-    collectAlternatives(entries.slice(0, pos).concat(alt).concat(entries.slice(pos + 1)), pos + 1, alternatives, getAlternatives);
+  
+  // TODO deve prendere in considerazione se l'entry corrente è illeggibile
+  // (e quindi evitare di usarla) e calcolare max solo su quelle leggibili
+  
+  // recurse with original digits
+  collectAlternatives(entries, pos + 1, alternatives, max, getSimilarDigits);
+  if (max <= 0) return;
+  // recurse with alternative digits
+  getSimilarDigits(entries[pos]).forEach(function(entry) {
+    collectAlternatives(spliceEntries(entries, pos, entry), pos + 1, alternatives, max - 1, getSimilarDigits);
   });
 }
 
+// try to resolve only one error per account
 function resolve(accounts) {
-  accounts.forEach(function(account) {
-    if (!getStatus(account.number)) {
-      return;
-    }
-    account.alternatives = [];
-    collectAlternatives(account.entries, 0, account.alternatives, function(entry) {
-      var altDigits = [];
-      Object.keys(digits).forEach(function(altEntry) {
-        if (diff(entry, altEntry).length == 1) {
-          altDigits.push(altEntry);
-        }
-      });
-      return altDigits;
-    });
-
-    /*
-    for (i = 0; i < account.number.length; i++) {
+  return _resolve(accounts, function(account) {
+    for (var i = 0; i < account.number.length; i++) {
       if (account.number[i] === '?') {
         Object.keys(digits).forEach(function(altEntry) {
+          if (account.entries[i] == altEntry) return;
           if (diff(account.entries[i], altEntry).length == 1) {
             var alternative = account.number.slice(0, i) + digits[altEntry] + account.number.slice(i + 1);
             if (isValid(alternative)) account.alternatives.push(alternative);
@@ -95,13 +101,38 @@ function resolve(accounts) {
         });
       }
     }
-    */
+  });
+}
+
+// explore the whole space of alternatives (fix even multiple read errors, i.e. errors occurred on different positions)
+function resolveMultiple(accounts, maxFixesPerAccount) {
+  if (!(maxFixesPerAccount >= 0)) maxFixesPerAccount = 9;
+  return _resolve(accounts, function(account) {
+    collectAlternatives(account.entries, 0, account.alternatives, maxFixesPerAccount, function(entry) {
+      return Object.keys(digits).filter(function(altEntry) {
+        return diff(entry, altEntry).length == 1
+      });
+    });
+  });
+}
+
+function _resolve(accounts, strategy) {
+  accounts.forEach(function(account) {
+    if (isValid(account.number)) {
+      //console.log('Skipping resolve: account number ' + account.number + ' is valid');
+      return;
+    }
+    account.alternatives = [];
+    strategy(account);
     if (account.alternatives.length == 0) {
+      //console.log('No alternatives found');
       accounts.status = 'ILL';
     } else if (account.alternatives.length == 1) {
+      //console.log('Found exactly 1 alternative');
       account.number = account.alternatives[0];
       account.status = '';
     } else {
+      //console.log('Found ' + account.alternatives.length + ' alternatives');
       account.alternatives.sort();
       account.status = 'AMB';
     }
@@ -127,6 +158,7 @@ function diff(text1, text2) {
   for (i = 0; i < text1.length && i < text2.length; i++) {
     if (text1[i] !== text2[i]) charDiff.push(text1[i]);
   }
+  //console.log('Diffing ' + (digits[text1] || '?') + ' against ' + (digits[text2] || '?') + ': ' + charDiff.length);
   return charDiff;
 }
 
@@ -137,6 +169,7 @@ module.exports = {
   parseText: parseText,
   addStatus: addStatus,
   resolve: resolve,
+  resolveMultiple: resolveMultiple,
   print: print,
   diff: diff
 }
